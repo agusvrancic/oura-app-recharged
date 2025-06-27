@@ -1,36 +1,136 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Task Manager App
 
-## Getting Started
+A modern, responsive task management application built with Next.js, TypeScript, Tailwind CSS, and Supabase.
 
-First, run the development server:
+## ✨ Features
+
+- 🔐 **Google Authentication** - Secure sign-in with Google OAuth
+- ✅ **Task Management** - Create, edit, delete, and toggle task completion
+- 📅 **Due Dates** - Set and track task due dates with calendar picker
+- 📱 **Responsive Design** - Works seamlessly on desktop and mobile
+- 🎨 **Modern UI** - Clean, intuitive interface with Tailwind CSS
+- 🔄 **Real-time Sync** - Tasks automatically sync across devices
+- 🔒 **Secure** - Row-level security ensures users only see their own tasks
+
+## 🚀 Tech Stack
+
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **UI Components**: shadcn/ui, Radix UI
+- **Backend**: Supabase (Database + Authentication)
+- **Deployment**: Vercel
+- **Icons**: Lucide React
+- **Date Handling**: date-fns
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- pnpm (or npm/yarn)
+- Supabase account
+- Google Cloud Console account (for OAuth)
+
+### 1. Clone the Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-username/task-manager-app.git
+cd task-manager-app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install Dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Set Up Supabase
 
-## Learn More
+Follow the detailed setup guide in [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)
 
-To learn more about Next.js, take a look at the following resources:
+### 4. Environment Variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Create a `.env.local` file in the root directory:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-## Deploy on Vercel
+### 5. Run the Development Server
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 📁 Project Structure
+
+```
+├── app/                    # Next.js app directory
+│   ├── (dashboard)/       # Dashboard pages
+│   ├── globals.css        # Global styles
+│   └── layout.tsx         # Root layout
+├── components/            # React components
+│   ├── ui/               # shadcn/ui components
+│   ├── AuthPage.tsx      # Authentication page
+│   ├── CreateTaskDialog.tsx
+│   ├── TaskCard.tsx
+│   └── ...
+├── contexts/             # React contexts
+│   └── AuthContext.tsx   # Authentication context
+├── hooks/                # Custom React hooks
+│   ├── useTasks.ts       # Local task management
+│   └── useSupabaseTasks.ts # Supabase task operations
+├── lib/                  # Utility libraries
+│   ├── supabase.ts       # Supabase client
+│   └── utils.ts          # Utility functions
+└── types/                # TypeScript type definitions
+    ├── database.ts       # Supabase database types
+    └── task.ts          # Task interface
+```
+
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Connect your GitHub repository to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy!
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+### Environment Variables for Production
+
+Make sure to add these in your Vercel dashboard:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+## 🔒 Security
+
+- **Row Level Security (RLS)** enabled on all database tables
+- **Google OAuth** for secure authentication
+- **Environment variables** for sensitive data
+- **User isolation** - users can only access their own tasks
+
+## 🎨 UI Components
+
+This project uses [shadcn/ui](https://ui.shadcn.com/) components built on top of Radix UI:
+
+- Button, Card, Dialog, Dropdown Menu
+- Calendar, Checkbox, Form, Input, Label
+- Popover and more
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📞 Support
+
+If you have any questions or issues, please open an issue on GitHub.
