@@ -21,22 +21,29 @@ export function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8 text-center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 border-neutral-200">
+      <Card className="w-full max-w-md py-8 px-12 text-center rounded-[24px] shadow-lg">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to TaskApp</h1>
-          <p className="text-gray-600">Sign in to manage your tasks</p>
+          <div className="flex justify-center mb-6">
+            <img 
+              src="/app-icon.png" 
+              alt="App Icon" 
+              className="w-16 h-16"
+            />
+          </div>
+          <h1 className="text-[28px] font-bold font-dm-sans text-gray-900 mb-2">Welcome to Oura.io</h1>
+          <p className="text-gray-500 text-[14px] font-dm-sans">Sign in to Oura to continue organizing your day and keep your productivity flowing.</p>
         </div>
         
         <Button 
           onClick={handleSignIn}
           disabled={loading}
-          className="w-full"
+          className="px-[32px] py-[16px] flex items-center justify-center text-center text-[14px] font-dm-sans w-auto mx-auto"
         >
           {loading ? 'Signing in...' : 'Sign in with Google'}
         </Button>
         
-        <p className="mt-4 text-sm text-gray-500">
+        <p className="mt-4 text-xs text-gray-400">
           Secure authentication powered by Supabase
         </p>
       </Card>
