@@ -25,7 +25,7 @@ export function useSupabaseTasks() {
         .from('tasks')
         .select(`
           *,
-          categories (
+          categories!tasks_category_id_fkey (
             id,
             name,
             icon,
@@ -50,7 +50,6 @@ export function useSupabaseTasks() {
         createdAt: task.created_at,
         updatedAt: task.updated_at
       })) || []
-
       setTasks(transformedTasks)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -87,7 +86,7 @@ export function useSupabaseTasks() {
         ])
         .select(`
           *,
-          categories (
+          categories!tasks_category_id_fkey (
             id,
             name,
             icon,
@@ -111,7 +110,6 @@ export function useSupabaseTasks() {
         createdAt: data.created_at,
         updatedAt: data.updated_at
       }
-
       setTasks(prev => [newTask, ...prev])
       return newTask
     } catch (err) {
@@ -154,7 +152,7 @@ export function useSupabaseTasks() {
         .eq('user_id', user.id)
         .select(`
           *,
-          categories (
+          categories!tasks_category_id_fkey (
             id,
             name,
             icon,

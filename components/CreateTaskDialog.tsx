@@ -49,8 +49,10 @@ export function CreateTaskDialog({
   const [priorityOpen, setPriorityOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
 
-  const { categories } = useSupabaseCategories();
+  const { categories, loading: categoriesLoading, error: categoriesError } = useSupabaseCategories();
   const priorities: ('High' | 'Mid' | 'Low')[] = ['High', 'Mid', 'Low'];
+
+
 
   const isControlled = controlledOpen !== undefined;
   const isEditing = !!taskToEdit;
@@ -131,6 +133,9 @@ export function CreateTaskDialog({
         <DialogTitle className="sr-only">
           {isEditing ? 'Edit Task' : 'Create New Task'}
         </DialogTitle>
+        <div className="sr-only" id="dialog-description">
+          {isEditing ? 'Edit the details of your task' : 'Create a new task with title, description, due date, category, and priority'}
+        </div>
         <div className="self-stretch p-4 bg-white shadow-[0px_8px_16px_0px_rgba(0,0,0,0.12)] flex flex-col justify-start items-start overflow-hidden">
           {/* Header */}
           <div className="self-stretch pb-3 inline-flex justify-start items-center">
@@ -252,20 +257,28 @@ export function CreateTaskDialog({
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-2 bg-white border border-neutral-200 shadow-lg" align="start">
                   <div className="flex flex-col gap-1">
-                    {categories.map((c) => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => {
-                          setCategory(c.id);
-                          setCategoryOpen(false);
-                        }}
-                        className="px-3 py-2 text-left text-sm hover:bg-gray-50 rounded flex items-center gap-2"
-                      >
-                        {c.icon && <span>{c.icon}</span>}
-                        {c.name}
-                      </button>
-                    ))}
+                    {categoriesLoading ? (
+                      <div className="px-3 py-2 text-sm text-gray-500">Loading categories...</div>
+                    ) : categoriesError ? (
+                      <div className="px-3 py-2 text-sm text-red-500">Error loading categories</div>
+                    ) : categories.length === 0 ? (
+                      <div className="px-3 py-2 text-sm text-gray-500">No categories yet. Create one first!</div>
+                    ) : (
+                      categories.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => {
+                            setCategory(c.id);
+                            setCategoryOpen(false);
+                          }}
+                          className="px-3 py-2 text-left text-sm hover:bg-gray-50 rounded flex items-center gap-2"
+                        >
+                          {c.icon && <span>{c.icon}</span>}
+                          {c.name}
+                        </button>
+                      ))
+                    )}
                   </div>
                 </PopoverContent>
               </Popover>
