@@ -105,7 +105,7 @@ export default function Home() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-[24px] font-regular text-neutral-900">
-            Hello, Username! <span className="hand">👋</span>
+            Hello, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}! <span className="hand">👋</span>
           </h1>
           <p className="text-[14px] text-neutral-500 mt-1 font-dm-sans">
             {currentDate}

@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
@@ -54,9 +55,9 @@ export function CreateCategoryDialog({
         <DialogTitle className="sr-only">
           Create New Category
         </DialogTitle>
-        <div className="sr-only" id="dialog-description">
+        <DialogPrimitive.Description className="sr-only">
           Create a new category with a name and optional icon
-        </div>
+        </DialogPrimitive.Description>
         <div className="self-stretch p-4 bg-white shadow-[0px_8px_16px_0px_rgba(0,0,0,0.12)] flex flex-col justify-start items-start overflow-hidden">
           {/* Header */}
           <div className="self-stretch pb-3 inline-flex justify-start items-center">
