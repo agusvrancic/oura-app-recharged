@@ -36,7 +36,7 @@ export function DeleteConfirmationDialog({
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="px-4 py-3 rounded-[12px] text-neutral-500 text-[13px] font-normal font-dm-sans hover:bg-neutral-100"
+            className="px-4 py-3 rounded-[12px] text-neutral-500 text-[13px] font-normal font-dm-sans hover:text-black"
           >
             Cancel
           </button>

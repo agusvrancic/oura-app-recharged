@@ -29,9 +29,9 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       <AppSidebar />
-      <main className="flex-1 bg-[#FAFAFA] min-h-screen">
+      <main className="flex-1 bg-[#FAFAFA] overflow-y-auto">
         <div className="px-[80px] py-[40px]">
           {children}
         </div>
