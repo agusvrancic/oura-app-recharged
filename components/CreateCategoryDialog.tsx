@@ -13,7 +13,7 @@ import { X } from 'lucide-react';
 interface CreateCategoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreateCategory: (name: string, icon?: string) => void;
+  onCreateCategory: (name: string, icon?: string) => Promise<void>;
 }
 
 export function CreateCategoryDialog({ 
@@ -23,6 +23,8 @@ export function CreateCategoryDialog({
 }: CreateCategoryDialogProps) {
   const [name, setName] = useState('');
   const [icon, setIcon] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -32,20 +34,31 @@ export function CreateCategoryDialog({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      const trimmedIcon = icon.trim();
-      onCreateCategory(name.trim(), trimmedIcon ? trimmedIcon : undefined);
-      setName('');
-      setIcon('');
-      onOpenChange(false);
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const trimmedIcon = icon.trim();
+        await onCreateCategory(name.trim(), trimmedIcon ? trimmedIcon : undefined);
+        setName('');
+        setIcon('');
+        onOpenChange(false);
+      } catch (err) {
+        console.error('Error creating category:', err);
+        setError(err instanceof Error ? err.message : 'Failed to create category');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   const handleClose = () => {
     setName('');
     setIcon('');
+    setError(null);
     onOpenChange(false);
   };
 
@@ -109,11 +122,19 @@ export function CreateCategoryDialog({
                   type="button"
                   onClick={() => setIcon(suggestedIcon)}
                   className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                  disabled={loading}
                 >
                   <span className="text-sm">{suggestedIcon}</span>
                 </button>
               ))}
             </div>
+
+            {/* Error Display */}
+            {error && (
+              <div className="self-stretch py-2 text-red-500 text-sm font-normal font-['DM_Sans']">
+                {error}
+              </div>
+            )}
 
             {/* Footer */}
             <div className="self-stretch pt-6 inline-flex justify-end items-center gap-3">
@@ -121,14 +142,18 @@ export function CreateCategoryDialog({
                 type="button"
                 onClick={handleClose}
                 className="px-4 py-2 rounded-[10px] flex justify-start items-center gap-2.5"
+                disabled={loading}
               >
                 <div className="justify-start text-neutral-500 text-xs font-medium font-['DM_Sans'] leading-tight">Cancel</div>
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-neutral-900 rounded-[10px] flex justify-start items-center gap-2.5"
+                className="px-4 py-2 bg-neutral-900 rounded-[10px] flex justify-start items-center gap-2.5 disabled:opacity-50"
+                disabled={loading}
               >
-                <div className="justify-start text-white text-xs font-medium font-['DM_Sans'] leading-tight">Create Category</div>
+                <div className="justify-start text-white text-xs font-medium font-['DM_Sans'] leading-tight">
+                  {loading ? 'Creating...' : 'Create Category'}
+                </div>
               </button>
             </div>
           </form>

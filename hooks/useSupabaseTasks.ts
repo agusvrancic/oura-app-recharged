@@ -25,7 +25,7 @@ export function useSupabaseTasks() {
         .from('tasks')
         .select(`
           *,
-          categories!tasks_category_id_fkey (
+          categories (
             id,
             name,
             icon,
@@ -44,7 +44,7 @@ export function useSupabaseTasks() {
         description: task.description || undefined,
         completed: task.completed,
         dueDate: task.due_date || undefined,
-        category: task.categories?.name || undefined,
+        category: task.category_id || undefined, // Use category_id instead of category name
         priority: task.priority || undefined,
         timeRange: task.time_range || undefined,
         createdAt: task.created_at,
@@ -69,6 +69,8 @@ export function useSupabaseTasks() {
   ) => {
     if (!user) throw new Error('User not authenticated')
 
+    console.log('Creating task with:', { title, description, dueDate, categoryId, priority, timeRange });
+
     try {
       const { data, error } = await supabase
         .from('tasks')
@@ -86,7 +88,7 @@ export function useSupabaseTasks() {
         ])
         .select(`
           *,
-          categories!tasks_category_id_fkey (
+          categories (
             id,
             name,
             icon,
@@ -95,7 +97,12 @@ export function useSupabaseTasks() {
         `)
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase insert error:', error);
+        throw error;
+      }
+
+      console.log('Task creation response:', data);
 
       // Transform and add to local state
       const newTask: Task = {
@@ -104,15 +111,22 @@ export function useSupabaseTasks() {
         description: data.description || undefined,
         completed: data.completed,
         dueDate: data.due_date || undefined,
-        category: data.categories?.name || undefined,
+        category: data.category_id || undefined, // Use category_id instead of category name
         priority: data.priority || undefined,
         timeRange: data.time_range || undefined,
         createdAt: data.created_at,
         updatedAt: data.updated_at
       }
-      setTasks(prev => [newTask, ...prev])
+
+      console.log('Transformed task:', newTask);
+      setTasks(prev => {
+        const updated = [newTask, ...prev];
+        console.log('Updated tasks list:', updated);
+        return updated;
+      });
       return newTask
     } catch (err) {
+      console.error('Add task error:', err);
       setError(err instanceof Error ? err.message : 'Failed to add task')
       throw err
     }
@@ -152,7 +166,7 @@ export function useSupabaseTasks() {
         .eq('user_id', user.id)
         .select(`
           *,
-          categories!tasks_category_id_fkey (
+          categories (
             id,
             name,
             icon,
@@ -172,7 +186,7 @@ export function useSupabaseTasks() {
               description: data.description || undefined,
               completed: data.completed,
               dueDate: data.due_date || undefined,
-              category: data.categories?.name || undefined,
+              category: data.category_id || undefined, // Use category_id instead of category name
               priority: data.priority || undefined,
               timeRange: data.time_range || undefined,
               createdAt: data.created_at,

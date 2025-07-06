@@ -33,6 +33,10 @@ export default function Home() {
 
   // Filter tasks based on active filter and category
   const filteredTasks = useMemo(() => {
+    console.log('All tasks:', tasks);
+    console.log('Active filter:', activeFilter);
+    console.log('Active category:', activeCategory);
+    
     let filtered = tasks;
     
     // Apply filter
@@ -42,16 +46,24 @@ export default function Home() {
       filtered = filtered.filter(task => task.completed);
     }
     
+    console.log('After filter:', filtered);
+    
     // Apply category filter
     if (activeCategory) {
       filtered = filtered.filter(task => task.category === activeCategory);
+      console.log('After category filter:', filtered);
     }
     
+    console.log('Final filtered tasks:', filtered);
     return filtered;
   }, [tasks, activeFilter, activeCategory]);
 
   // Group tasks by category
   const tasksByCategory = useMemo(() => {
+    console.log('Grouping tasks by category...');
+    console.log('Categories:', categories);
+    console.log('Filtered tasks for grouping:', filteredTasks);
+    
     const grouped = new Map<string, Task[]>();
     
     categories.forEach(category => {
@@ -62,12 +74,15 @@ export default function Home() {
     grouped.set('uncategorized', []);
     
     filteredTasks.forEach((task: Task) => {
+      console.log('Processing task for grouping:', task);
       const categoryId = task.category || 'uncategorized';
+      console.log('Task category ID:', categoryId);
       const categoryTasks = grouped.get(categoryId) || [];
       categoryTasks.push(task);
       grouped.set(categoryId, categoryTasks);
     });
     
+    console.log('Grouped tasks:', grouped);
     return grouped;
   }, [filteredTasks, categories]);
 
@@ -87,17 +102,17 @@ export default function Home() {
     setIsCreateCategoryDialogOpen(true);
   };
 
-  const handleCreateCategory = (name: string, icon?: string) => {
-    addCategory(name, icon);
+  const handleCreateCategory = async (name: string, icon?: string) => {
+    await addCategory(name, icon);
     // Note: The newly created category will be automatically visible since 
     // categories without tasks are filtered out in the render logic
   };
 
-  const handleAddTaskWithCategory = (categoryId: string) => (title: string, description?: string, dueDate?: string, categoryIdParam?: string, priority?: 'High' | 'Mid' | 'Low', timeRange?: string) => {
-    // Use the provided categoryId or fall back to the categoryId from the section
-    const finalCategoryId = categoryIdParam || categoryId;
-    addTask(title, description, dueDate, finalCategoryId, priority, timeRange);
-  };
+     const handleAddTaskWithCategory = (categoryId: string) => (title: string, description?: string, dueDate?: string, categoryIdParam?: string, priority?: 'High' | 'Mid' | 'Low', timeRange?: string) => {
+     // Use the provided categoryId or fall back to the categoryId from the section
+     const finalCategoryId = categoryIdParam || categoryId;
+     addTask(title, description, dueDate, finalCategoryId, priority, timeRange);
+   };
 
   return (
     <div className="flex flex-col h-full">
