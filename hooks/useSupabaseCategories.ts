@@ -21,6 +21,7 @@ export function useSupabaseCategories() {
 
     try {
       setLoading(true)
+
       const { data, error } = await supabase
         .from('categories')
         .select('*')
@@ -143,13 +144,14 @@ export function useSupabaseCategories() {
 
   // Create default categories for new users
   const createDefaultCategories = async () => {
-    if (!user) throw new Error('User not authenticated')
+    if (!user) return
 
     const defaultCategories = [
-      { name: 'Personal', icon: '👤', color: '#3B82F6' },
       { name: 'Work', icon: '💼', color: '#10B981' },
+      { name: 'Personal', icon: '👤', color: '#3B82F6' },
       { name: 'Health', icon: '🏥', color: '#EF4444' },
-      { name: 'Learning', icon: '📚', color: '#8B5CF6' }
+      { name: 'Learning', icon: '📚', color: '#8B5CF6' },
+      { name: 'Shopping', icon: '🛒', color: '#F59E0B' }
     ]
 
     try {
@@ -166,13 +168,13 @@ export function useSupabaseCategories() {
       if (error) throw error
 
       // Transform and add to local state
-      const newCategories: Category[] = data?.map(category => ({
+      const newCategories: Category[] = data.map(category => ({
         id: category.id,
         name: category.name,
         icon: category.icon || undefined,
         color: category.color || undefined,
         createdAt: category.created_at
-      })) || []
+      }))
 
       setCategories(prev => [...prev, ...newCategories])
       return newCategories
@@ -182,6 +184,7 @@ export function useSupabaseCategories() {
     }
   }
 
+  // Fetch categories on component mount and when user changes
   useEffect(() => {
     fetchCategories()
   }, [user])

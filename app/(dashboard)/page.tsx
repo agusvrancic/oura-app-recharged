@@ -3,8 +3,6 @@
 import { useState, useMemo } from 'react';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import { useSupabaseCategories } from '@/hooks/useSupabaseCategories';
-// import { useMockTasks } from '@/hooks/useMockTasks';
-// import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/contexts/AuthContext';
 import { CreateTaskDialog } from '@/components/CreateTaskDialog';
 import { CreateCategoryDialog } from '@/components/CreateCategoryDialog';
@@ -17,8 +15,10 @@ import { FilterType, Task } from '@/types/task';
 export default function Home() {
   const { user } = useAuth();
   const { tasks, addTask, toggleTask, editTask, deleteTask, loading } = useSupabaseTasks();
-  const { categories, addCategory } = useSupabaseCategories();
+  const { categories, addCategory, updateCategory, deleteCategory } = useSupabaseCategories();
   
+
+
   const [activeFilter, setActiveFilter] = useState<FilterType>('All');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['work', 'home', 'uncategorized']));
@@ -33,10 +33,6 @@ export default function Home() {
 
   // Filter tasks based on active filter and category
   const filteredTasks = useMemo(() => {
-    console.log('All tasks:', tasks);
-    console.log('Active filter:', activeFilter);
-    console.log('Active category:', activeCategory);
-    
     let filtered = tasks;
     
     // Apply filter
@@ -46,24 +42,16 @@ export default function Home() {
       filtered = filtered.filter(task => task.completed);
     }
     
-    console.log('After filter:', filtered);
-    
     // Apply category filter
     if (activeCategory) {
       filtered = filtered.filter(task => task.category === activeCategory);
-      console.log('After category filter:', filtered);
     }
     
-    console.log('Final filtered tasks:', filtered);
     return filtered;
   }, [tasks, activeFilter, activeCategory]);
 
   // Group tasks by category
   const tasksByCategory = useMemo(() => {
-    console.log('Grouping tasks by category...');
-    console.log('Categories:', categories);
-    console.log('Filtered tasks for grouping:', filteredTasks);
-    
     const grouped = new Map<string, Task[]>();
     
     categories.forEach(category => {
@@ -74,15 +62,12 @@ export default function Home() {
     grouped.set('uncategorized', []);
     
     filteredTasks.forEach((task: Task) => {
-      console.log('Processing task for grouping:', task);
       const categoryId = task.category || 'uncategorized';
-      console.log('Task category ID:', categoryId);
       const categoryTasks = grouped.get(categoryId) || [];
       categoryTasks.push(task);
       grouped.set(categoryId, categoryTasks);
     });
     
-    console.log('Grouped tasks:', grouped);
     return grouped;
   }, [filteredTasks, categories]);
 
@@ -106,6 +91,14 @@ export default function Home() {
     await addCategory(name, icon);
     // Note: The newly created category will be automatically visible since 
     // categories without tasks are filtered out in the render logic
+  };
+
+  const handleEditCategory = async (id: string, name: string, icon?: string) => {
+    await updateCategory(id, { name, icon });
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    await deleteCategory(id);
   };
 
      const handleAddTaskWithCategory = (categoryId: string) => (title: string, description?: string, dueDate?: string, categoryIdParam?: string, priority?: 'High' | 'Mid' | 'Low', timeRange?: string) => {
@@ -179,6 +172,8 @@ export default function Home() {
                   onEditTask={editTask}
                   onDeleteTask={deleteTask}
                   onAddTask={handleAddTaskWithCategory(category.id)}
+                  onEditCategory={handleEditCategory}
+                  onDeleteCategory={handleDeleteCategory}
                 />
               );
             })}
@@ -202,6 +197,7 @@ export default function Home() {
                   onEditTask={editTask}
                   onDeleteTask={deleteTask}
                   onAddTask={(title, description, dueDate, categoryId, priority, timeRange) => addTask(title, description, dueDate, categoryId, priority, timeRange)}
+                  // Don't provide edit/delete for uncategorized section
                 />
               );
             })()}

@@ -21,6 +21,7 @@ export function useSupabaseTasks() {
 
     try {
       setLoading(true)
+
       const { data, error } = await supabase
         .from('tasks')
         .select(`
@@ -44,7 +45,7 @@ export function useSupabaseTasks() {
         description: task.description || undefined,
         completed: task.completed,
         dueDate: task.due_date || undefined,
-        category: task.category_id || undefined, // Use category_id instead of category name
+        category: task.category_id || undefined,
         priority: task.priority || undefined,
         timeRange: task.time_range || undefined,
         createdAt: task.created_at,
@@ -68,8 +69,6 @@ export function useSupabaseTasks() {
     timeRange?: string
   ) => {
     if (!user) throw new Error('User not authenticated')
-
-    console.log('Creating task with:', { title, description, dueDate, categoryId, priority, timeRange });
 
     try {
       const { data, error } = await supabase
@@ -98,11 +97,8 @@ export function useSupabaseTasks() {
         .single()
 
       if (error) {
-        console.error('Supabase insert error:', error);
         throw error;
       }
-
-      console.log('Task creation response:', data);
 
       // Transform and add to local state
       const newTask: Task = {
@@ -111,57 +107,40 @@ export function useSupabaseTasks() {
         description: data.description || undefined,
         completed: data.completed,
         dueDate: data.due_date || undefined,
-        category: data.category_id || undefined, // Use category_id instead of category name
+        category: data.category_id || undefined,
         priority: data.priority || undefined,
         timeRange: data.time_range || undefined,
         createdAt: data.created_at,
         updatedAt: data.updated_at
       }
 
-      console.log('Transformed task:', newTask);
-      setTasks(prev => {
-        const updated = [newTask, ...prev];
-        console.log('Updated tasks list:', updated);
-        return updated;
-      });
+      setTasks(prev => [newTask, ...prev])
       return newTask
     } catch (err) {
-      console.error('Add task error:', err);
       setError(err instanceof Error ? err.message : 'Failed to add task')
       throw err
     }
   }
 
-  // Update task with category and priority support
+  // Update task - fixed to preserve category when not explicitly updating it
   const updateTask = async (id: string, updates: Partial<Omit<Task, 'id'>>) => {
     if (!user) throw new Error('User not authenticated')
 
     try {
-      // First, get the category_id if category name is provided
-      let categoryId = null
-      if (updates.category) {
-        const { data: categoryData } = await supabase
-          .from('categories')
-          .select('id')
-          .eq('name', updates.category)
-          .eq('user_id', user.id)
-          .single()
-        
-        categoryId = categoryData?.id || null
-      }
+      // Create update object, only including category_id if category is being explicitly updated
+      const updateData: any = {}
+      
+      if (updates.title !== undefined) updateData.title = updates.title
+      if (updates.description !== undefined) updateData.description = updates.description || null
+      if (updates.completed !== undefined) updateData.completed = updates.completed
+      if (updates.dueDate !== undefined) updateData.due_date = updates.dueDate || null
+      if (updates.category !== undefined) updateData.category_id = updates.category || null
+      if (updates.priority !== undefined) updateData.priority = updates.priority || null
+      if (updates.timeRange !== undefined) updateData.time_range = updates.timeRange || null
 
       const { data, error } = await supabase
         .from('tasks')
-        .update({
-          title: updates.title,
-          description: updates.description || null,
-          due_date: updates.dueDate || null,
-          category_id: categoryId,
-          priority: updates.priority || null,
-          time_range: updates.timeRange || null,
-          completed: updates.completed,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', id)
         .eq('user_id', user.id)
         .select(`
@@ -177,23 +156,24 @@ export function useSupabaseTasks() {
 
       if (error) throw error
 
-      // Update local state
+      // Transform and update local state
+      const updatedTask: Task = {
+        id: data.id,
+        title: data.title,
+        description: data.description || undefined,
+        completed: data.completed,
+        dueDate: data.due_date || undefined,
+        category: data.category_id || undefined,
+        priority: data.priority || undefined,
+        timeRange: data.time_range || undefined,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at
+      }
+
       setTasks(prev => prev.map(task => 
-        task.id === id 
-          ? {
-              id: data.id,
-              title: data.title,
-              description: data.description || undefined,
-              completed: data.completed,
-              dueDate: data.due_date || undefined,
-              category: data.category_id || undefined, // Use category_id instead of category name
-              priority: data.priority || undefined,
-              timeRange: data.time_range || undefined,
-              createdAt: data.created_at,
-              updatedAt: data.updated_at
-            }
-          : task
+        task.id === id ? updatedTask : task
       ))
+      return updatedTask
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update task')
       throw err
@@ -221,15 +201,15 @@ export function useSupabaseTasks() {
     }
   }
 
-  // Toggle task completion
+  // Toggle task completion status
   const toggleTask = async (id: string) => {
     const task = tasks.find(t => t.id === id)
-    if (!task) return
-
+    if (!task) throw new Error('Task not found')
+    
     await updateTask(id, { completed: !task.completed })
   }
 
-  // Edit task with full parameter support
+  // Edit task with all fields
   const editTask = async (
     id: string, 
     title: string, 
@@ -239,9 +219,17 @@ export function useSupabaseTasks() {
     priority?: 'High' | 'Mid' | 'Low',
     timeRange?: string
   ) => {
-    await updateTask(id, { title, description, dueDate, category, priority, timeRange })
+    await updateTask(id, {
+      title,
+      description,
+      dueDate,
+      category,
+      priority,
+      timeRange
+    })
   }
 
+  // Fetch tasks on component mount and when user changes
   useEffect(() => {
     fetchTasks()
   }, [user])

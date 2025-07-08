@@ -2,12 +2,14 @@
 
 import { ListTodo, MoreHorizontal, LogOut, Settings } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import Image from 'next/image'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from 'next/link'
 
 // Menu items
@@ -33,14 +35,20 @@ export function AppSidebar() {
   return (
     <aside className="w-[250px] bg-white border-r border-gray-200 flex flex-col h-screen overflow-hidden">
       {/* Header */}
-      <div className="p-6 pb-8 flex-shrink-0">
+      <div className="px-4 pt-6 pb-8 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-neutral-900 rounded-[10px] flex items-center justify-center">
-            <span className="text-white text-xl font-bold">O</span>
+          <div className="w-9 h-9 relative">
+            <Image
+              src="/app-icon.png"
+              alt="Ora App Logo"
+              width={36}
+              height={36}
+              className="rounded-[10px]"
+            />
           </div>
           <div className="flex flex-col">
             <span className="text-neutral-900 text-base font-bold leading-tight font-dm-sans">
-              Oura.io
+              Ora
             </span>
             <span className="text-neutral-400 text-xs leading-none mt-1 font-dm-sans">
               Free Plan
@@ -71,11 +79,15 @@ export function AppSidebar() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 w-full text-left transition-colors">
-              <div className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-gray-600 font-medium text-sm font-dm-sans">
+              <Avatar className="w-9 h-9 flex-shrink-0">
+                <AvatarImage 
+                  src={user?.user_metadata?.avatar_url || ''} 
+                  alt={user?.user_metadata?.full_name || 'User Avatar'} 
+                />
+                <AvatarFallback className="bg-gray-200 text-gray-600 font-medium text-sm font-dm-sans">
                   {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                </span>
-              </div>
+                </AvatarFallback>
+              </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-normal text-gray-900 truncate font-dm-sans">
                   {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
