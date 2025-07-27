@@ -23,10 +23,10 @@ export default function DashboardLayout({
     );
   }
 
-  // Check if user is authenticated (temporarily disabled for testing)
-  // if (!user) {
-  //   return <AuthPage />;
-  // }
+  // Check if user is authenticated
+  if (!user) {
+    return <AuthPage />;
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">

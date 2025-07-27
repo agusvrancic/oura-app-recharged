@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-// import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
-// import { useSupabaseCategories } from '@/hooks/useSupabaseCategories';
-// import { useAuth } from '@/contexts/AuthContext';
-import { useMockTasks, useMockCategories, MockCategory } from '@/hooks/useMockData';
+import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
+import { useSupabaseCategories } from '@/hooks/useSupabaseCategories';
+import { useAuth } from '@/contexts/AuthContext';
 import { CreateTaskDialog } from '@/components/CreateTaskDialog';
 import { CreateCategoryDialog } from '@/components/CreateCategoryDialog';
 import { CategoryTabs } from '@/components/CategoryTabs';
@@ -13,13 +12,12 @@ import { TaskCard } from '@/components/TaskCard';
 import { EmptyState } from '@/components/EmptyState';
 import { ScrumBoard } from '@/components/ScrumBoard';
 import { ViewToggle } from '@/components/ViewToggle';
-import { FilterType, Task } from '@/types/task';
+import { FilterType, Task, Category } from '@/types/task';
 
 export default function Home() {
-  // const { user } = useAuth();
-  const user = { user_metadata: { full_name: 'Test User' }, email: 'test@example.com' }; // Mock user for testing
-  const { tasks, addTask, toggleTask, editTask, deleteTask, updateTaskStatus, loading } = useMockTasks();
-  const { categories, addCategory, updateCategory, deleteCategory } = useMockCategories();
+  const { user } = useAuth();
+  const { tasks, addTask, toggleTask, editTask, deleteTask, updateTaskStatus, loading } = useSupabaseTasks();
+  const { categories, addCategory, updateCategory, deleteCategory } = useSupabaseCategories();
   
   const [activeFilter, setActiveFilter] = useState<FilterType>('All');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -57,7 +55,7 @@ export default function Home() {
   const tasksByCategory = useMemo(() => {
     const grouped = new Map<string, Task[]>();
     
-    categories.forEach((category: MockCategory) => {
+    categories.forEach((category: Category) => {
       grouped.set(category.id, []);
     });
     
@@ -173,7 +171,7 @@ export default function Home() {
         ) : (
           // Category sections view (List)
           <div className="space-y-6">
-            {categories.map((category: MockCategory) => {
+            {categories.map((category: Category) => {
               const categoryTasks = tasksByCategory.get(category.id) || [];
               if (categoryTasks.length === 0) return null;
               
