@@ -149,6 +149,7 @@ export default function Home() {
           // Board view
           <ScrumBoard
             tasks={filteredTasks}
+            categories={categories}
             onToggleTask={toggleTask}
             onEditTask={editTask}
             onDeleteTask={deleteTask}

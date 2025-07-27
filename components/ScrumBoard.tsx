@@ -31,13 +31,14 @@ import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
 interface ScrumBoardProps {
   tasks: Task[];
+  categories?: Array<{ id: string; name: string; icon?: string; }>;
   onToggleTask: (id: string) => void;
   onEditTask: (id: string, title: string, description?: string, dueDate?: string, category?: string, priority?: 'High' | 'Mid' | 'Low', timeRange?: string) => void;
   onDeleteTask: (id: string) => void;
   onUpdateStatus: (id: string, status: 'todo' | 'in-progress' | 'done') => void;
 }
 
-export function ScrumBoard({ tasks, onToggleTask, onEditTask, onDeleteTask, onUpdateStatus }: ScrumBoardProps) {
+export function ScrumBoard({ tasks, categories = [], onToggleTask, onEditTask, onDeleteTask, onUpdateStatus }: ScrumBoardProps) {
   // Use the actual status field to organize tasks
   const todoTasks = tasks.filter(task => task.status === 'todo');
   const inProgressTasks = tasks.filter(task => task.status === 'in-progress');
@@ -55,16 +56,21 @@ export function ScrumBoard({ tasks, onToggleTask, onEditTask, onDeleteTask, onUp
   );
 
   const getCategoryDisplay = (categoryId?: string) => {
-    switch (categoryId) {
-      case 'work':
-        return { icon: '💼', name: 'Work' };
-      case 'personal':
-        return { icon: '🏠', name: 'Home' };
-      case 'learning':
-        return { icon: '📚', name: 'Learning' };
-      default:
-        return { icon: '📝', name: 'Other' };
+    if (!categoryId) {
+      return { icon: '📝', name: 'Uncategorized' };
     }
+    
+    // Look up the actual category from the categories prop
+    const category = categories.find(cat => cat.id === categoryId);
+    if (category) {
+      return { 
+        icon: category.icon || '📁', 
+        name: category.name 
+      };
+    }
+    
+    // Fallback for unknown categories
+    return { icon: '📝', name: 'Other' };
   };
 
   const getPriorityStyles = (priority?: string) => {
