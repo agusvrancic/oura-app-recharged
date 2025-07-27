@@ -62,7 +62,8 @@ export function TaskCard({ task, onToggle, onEdit, onDelete, onUpdateStatus }: T
     }
   };
 
-  if (task.completed) {
+  // Render completed/done tasks differently
+  if (task.completed || task.status === 'done') {
     return (
       <>
         <div 
@@ -70,13 +71,13 @@ export function TaskCard({ task, onToggle, onEdit, onDelete, onUpdateStatus }: T
           onClick={handleCardClick}
         >
           <div className="flex justify-start items-center gap-2.5">
-                      <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCheckboxClick();
-            }}
-            className="w-5 h-5 relative flex items-center justify-center"
-          >
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCheckboxClick();
+              }}
+              className="w-5 h-5 relative flex items-center justify-center"
+            >
               <div className="w-5 h-5 absolute bg-gray-700 rounded-md"></div>
               <svg 
                 className="w-3 h-3 text-white relative z-10" 
