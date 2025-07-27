@@ -49,15 +49,20 @@ export function TaskCard({ task, onToggle, onEdit, onDelete, onUpdateStatus }: T
 
   // Handle checkbox cycling through states
   const handleCheckboxClick = () => {
+    console.log('handleCheckboxClick called for task:', task.id, 'current status:', task.status);
+    
     if (onUpdateStatus) {
       // Cycle through: todo → in-progress → done
       const nextStatus = 
         task.status === 'todo' ? 'in-progress' :
         task.status === 'in-progress' ? 'done' :
         'todo'; // Reset back to todo from done
+      
+      console.log('Using onUpdateStatus, next status:', nextStatus);
       onUpdateStatus(task.id, nextStatus);
     } else {
       // Fallback to old toggle behavior if onUpdateStatus not available
+      console.log('onUpdateStatus not available, using onToggle fallback');
       onToggle(task.id);
     }
   };
