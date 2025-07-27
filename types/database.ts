@@ -33,6 +33,7 @@ export interface Database {
           title: string
           description: string | null
           completed: boolean
+          status: 'todo' | 'in-progress' | 'done'
           due_date: string | null
           category_id: string | null
           priority: 'High' | 'Mid' | 'Low' | null
@@ -46,6 +47,7 @@ export interface Database {
           title: string
           description?: string | null
           completed?: boolean
+          status?: 'todo' | 'in-progress' | 'done'
           due_date?: string | null
           category_id?: string | null
           priority?: 'High' | 'Mid' | 'Low' | null
@@ -59,6 +61,7 @@ export interface Database {
           title?: string
           description?: string | null
           completed?: boolean
+          status?: 'todo' | 'in-progress' | 'done'
           due_date?: string | null
           category_id?: string | null
           priority?: 'High' | 'Mid' | 'Low' | null

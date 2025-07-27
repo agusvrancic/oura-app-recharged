@@ -23,15 +23,15 @@ export default function DashboardLayout({
     );
   }
 
-  // Check if user is authenticated
-  if (!user) {
-    return <AuthPage />;
-  }
+  // Check if user is authenticated (temporarily disabled for testing)
+  // if (!user) {
+  //   return <AuthPage />;
+  // }
 
   return (
     <div className="flex h-screen overflow-hidden">
       <AppSidebar />
-      <main className="flex-1 bg-[#FAFAFA] overflow-y-auto">
+      <main className="flex-1 bg-white overflow-y-auto">
         <div className="px-[80px] py-[40px]">
           {children}
         </div>

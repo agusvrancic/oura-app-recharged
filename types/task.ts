@@ -2,7 +2,8 @@ export interface Task {
   id: string;
   title: string;
   description?: string;
-  completed: boolean;
+  completed: boolean; // Keep for backward compatibility, will be derived from status
+  status: 'todo' | 'in-progress' | 'done';
   dueDate?: string;
   category?: string;
   priority?: 'High' | 'Mid' | 'Low';

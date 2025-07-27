@@ -36,12 +36,13 @@ CREATE TABLE categories (
   UNIQUE(name, user_id)
 );
 
--- Create tasks table with category and priority support
+-- Create tasks table with category, priority, and status support
 CREATE TABLE tasks (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
   completed BOOLEAN DEFAULT FALSE,
+  status TEXT DEFAULT 'todo' CHECK (status IN ('todo', 'in-progress', 'done')),
   due_date TIMESTAMPTZ,
   category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
   priority TEXT CHECK (priority IN ('High', 'Mid', 'Low')),
@@ -106,7 +107,25 @@ INSERT INTO categories (name, icon, color, user_id) VALUES
   ('Learning', '📚', '#8B5CF6', 'YOUR_USER_ID_HERE');
 ```
 
-## 4. Database Migration (If you already have existing data)
+## 4. Board Functionality Migration (Required for Board View)
+
+If you already have an existing database, run this migration to add board support:
+
+```sql
+-- Add status column to existing tasks table
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'todo' CHECK (status IN ('todo', 'in-progress', 'done'));
+
+-- Update existing tasks to have proper status based on completed field
+UPDATE tasks SET status = CASE 
+  WHEN completed = true THEN 'done'
+  ELSE 'todo'
+END WHERE status IS NULL;
+
+-- Make status NOT NULL after setting default values
+ALTER TABLE tasks ALTER COLUMN status SET NOT NULL;
+```
+
+## 5. Database Migration (If you already have existing data)
 
 If you already have tasks in your database, run this migration:
 
@@ -115,6 +134,16 @@ If you already have tasks in your database, run this migration:
 ALTER TABLE tasks ADD COLUMN IF NOT EXISTS category_id UUID REFERENCES categories(id) ON DELETE SET NULL;
 ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority TEXT CHECK (priority IN ('High', 'Mid', 'Low'));
 ALTER TABLE tasks ADD COLUMN IF NOT EXISTS time_range TEXT;
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'todo' CHECK (status IN ('todo', 'in-progress', 'done'));
+
+-- Update existing tasks to have proper status based on completed field
+UPDATE tasks SET status = CASE 
+  WHEN completed = true THEN 'done'
+  ELSE 'todo'
+END WHERE status IS NULL;
+
+-- Make status NOT NULL after setting default values
+ALTER TABLE tasks ALTER COLUMN status SET NOT NULL;
 
 -- Create categories table if it doesn't exist
 CREATE TABLE IF NOT EXISTS categories (
@@ -149,7 +178,7 @@ CREATE POLICY "Users can delete their own categories" ON categories
   FOR DELETE USING (auth.uid() = user_id);
 ```
 
-## 5. Configure Google OAuth
+## 6. Configure Google OAuth
 
 1. In your Supabase dashboard, go to Authentication → Providers
 2. Enable Google provider
@@ -161,7 +190,7 @@ CREATE POLICY "Users can delete their own categories" ON categories
    - Add your Supabase redirect URL: `https://your-project-ref.supabase.co/auth/v1/callback`
    - Copy Client ID and Client Secret to Supabase
 
-## 6. Set Up Default Categories (Optional)
+## 7. Set Up Default Categories (Optional)
 
 After you create your first user account, you can run this SQL to create default categories:
 
@@ -179,7 +208,7 @@ To find your user ID:
 2. Find your user and copy the ID
 3. Replace 'YOUR_USER_ID_HERE' in the SQL above
 
-## 7. Test Your Setup
+## 8. Test Your Setup
 
 1. Start your development server: `pnpm dev`
 2. Visit your app and try signing in with Google

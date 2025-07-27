@@ -1,28 +1,31 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
-import { useSupabaseCategories } from '@/hooks/useSupabaseCategories';
-import { useAuth } from '@/contexts/AuthContext';
+// import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
+// import { useSupabaseCategories } from '@/hooks/useSupabaseCategories';
+// import { useAuth } from '@/contexts/AuthContext';
+import { useMockTasks, useMockCategories, MockCategory } from '@/hooks/useMockData';
 import { CreateTaskDialog } from '@/components/CreateTaskDialog';
 import { CreateCategoryDialog } from '@/components/CreateCategoryDialog';
 import { CategoryTabs } from '@/components/CategoryTabs';
 import { CategorySection } from '@/components/CategorySection';
 import { TaskCard } from '@/components/TaskCard';
 import { EmptyState } from '@/components/EmptyState';
+import { ScrumBoard } from '@/components/ScrumBoard';
+import { ViewToggle } from '@/components/ViewToggle';
 import { FilterType, Task } from '@/types/task';
 
 export default function Home() {
-  const { user } = useAuth();
-  const { tasks, addTask, toggleTask, editTask, deleteTask, loading } = useSupabaseTasks();
-  const { categories, addCategory, updateCategory, deleteCategory } = useSupabaseCategories();
+  // const { user } = useAuth();
+  const user = { user_metadata: { full_name: 'Test User' }, email: 'test@example.com' }; // Mock user for testing
+  const { tasks, addTask, toggleTask, editTask, deleteTask, updateTaskStatus, loading } = useMockTasks();
+  const { categories, addCategory, updateCategory, deleteCategory } = useMockCategories();
   
-
-
   const [activeFilter, setActiveFilter] = useState<FilterType>('All');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['work', 'home', 'uncategorized']));
   const [isCreateCategoryDialogOpen, setIsCreateCategoryDialogOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
   
   const currentDate = new Date().toLocaleDateString('en-US', { 
     weekday: 'long',
@@ -54,7 +57,7 @@ export default function Home() {
   const tasksByCategory = useMemo(() => {
     const grouped = new Map<string, Task[]>();
     
-    categories.forEach(category => {
+    categories.forEach((category: MockCategory) => {
       grouped.set(category.id, []);
     });
     
@@ -119,7 +122,10 @@ export default function Home() {
             {currentDate}
           </p>
         </div>
-        <CreateTaskDialog onCreateTask={(title, description, dueDate, categoryId, priority, timeRange) => addTask(title, description, dueDate, categoryId, priority, timeRange)} />
+        <div className="flex items-center gap-4">
+          <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+          <CreateTaskDialog onCreateTask={(title, description, dueDate, categoryId, priority, timeRange) => addTask(title, description, dueDate, categoryId, priority, timeRange)} />
+        </div>
       </div>
 
       {/* Category Tabs */}
@@ -141,23 +147,33 @@ export default function Home() {
           </div>
         ) : filteredTasks.length === 0 ? (
           <EmptyState />
+        ) : viewMode === 'board' ? (
+          // Board view
+          <ScrumBoard
+            tasks={filteredTasks}
+            onToggleTask={toggleTask}
+            onEditTask={editTask}
+            onDeleteTask={deleteTask}
+            onUpdateStatus={updateTaskStatus}
+          />
         ) : activeCategory ? (
-          // Single category view
+          // Single category view (List)
           <div>
-            {filteredTasks.map((task) => (
+            {filteredTasks.map((task: Task) => (
               <TaskCard 
                 key={task.id} 
                 task={task} 
                 onToggle={toggleTask}
                 onEdit={editTask}
                 onDelete={deleteTask}
+                onUpdateStatus={updateTaskStatus}
               />
             ))}
           </div>
         ) : (
-          // Category sections view
+          // Category sections view (List)
           <div className="space-y-6">
-            {categories.map((category) => {
+            {categories.map((category: MockCategory) => {
               const categoryTasks = tasksByCategory.get(category.id) || [];
               if (categoryTasks.length === 0) return null;
               
@@ -174,6 +190,7 @@ export default function Home() {
                   onAddTask={handleAddTaskWithCategory(category.id)}
                   onEditCategory={handleEditCategory}
                   onDeleteCategory={handleDeleteCategory}
+                  onUpdateTaskStatus={updateTaskStatus}
                 />
               );
             })}
@@ -197,6 +214,7 @@ export default function Home() {
                   onEditTask={editTask}
                   onDeleteTask={deleteTask}
                   onAddTask={(title, description, dueDate, categoryId, priority, timeRange) => addTask(title, description, dueDate, categoryId, priority, timeRange)}
+                  onUpdateTaskStatus={updateTaskStatus}
                   // Don't provide edit/delete for uncategorized section
                 />
               );

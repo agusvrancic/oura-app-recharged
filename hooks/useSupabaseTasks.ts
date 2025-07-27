@@ -44,6 +44,7 @@ export function useSupabaseTasks() {
         title: task.title,
         description: task.description || undefined,
         completed: task.completed,
+        status: task.status || 'todo', // Default to 'todo' if status is missing
         dueDate: task.due_date || undefined,
         category: task.category_id || undefined,
         priority: task.priority || undefined,
@@ -82,7 +83,8 @@ export function useSupabaseTasks() {
             priority: priority || null,
             time_range: timeRange || null,
             user_id: user.id,
-            completed: false
+            completed: false,
+            status: 'todo'
           }
         ])
         .select(`
@@ -106,6 +108,7 @@ export function useSupabaseTasks() {
         title: data.title,
         description: data.description || undefined,
         completed: data.completed,
+        status: data.status || 'todo',
         dueDate: data.due_date || undefined,
         category: data.category_id || undefined,
         priority: data.priority || undefined,
@@ -127,12 +130,13 @@ export function useSupabaseTasks() {
     if (!user) throw new Error('User not authenticated')
 
     try {
-      // Create update object, only including category_id if category is being explicitly updated
+      // Create update object, only including fields that are being explicitly updated
       const updateData: any = {}
       
       if (updates.title !== undefined) updateData.title = updates.title
       if (updates.description !== undefined) updateData.description = updates.description || null
       if (updates.completed !== undefined) updateData.completed = updates.completed
+      if (updates.status !== undefined) updateData.status = updates.status
       if (updates.dueDate !== undefined) updateData.due_date = updates.dueDate || null
       if (updates.category !== undefined) updateData.category_id = updates.category || null
       if (updates.priority !== undefined) updateData.priority = updates.priority || null
@@ -162,6 +166,7 @@ export function useSupabaseTasks() {
         title: data.title,
         description: data.description || undefined,
         completed: data.completed,
+        status: data.status || 'todo',
         dueDate: data.due_date || undefined,
         category: data.category_id || undefined,
         priority: data.priority || undefined,
@@ -176,6 +181,60 @@ export function useSupabaseTasks() {
       return updatedTask
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update task')
+      throw err
+    }
+  }
+
+  // Update task status specifically for board functionality
+  const updateTaskStatus = async (id: string, status: 'todo' | 'in-progress' | 'done') => {
+    if (!user) throw new Error('User not authenticated')
+
+    try {
+      // Also update completed field to maintain backward compatibility
+      const completed = status === 'done'
+      
+      const { data, error } = await supabase
+        .from('tasks')
+        .update({ 
+          status,
+          completed
+        })
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select(`
+          *,
+          categories (
+            id,
+            name,
+            icon,
+            color
+          )
+        `)
+        .single()
+
+      if (error) throw error
+
+      // Transform and update local state
+      const updatedTask: Task = {
+        id: data.id,
+        title: data.title,
+        description: data.description || undefined,
+        completed: data.completed,
+        status: data.status || 'todo',
+        dueDate: data.due_date || undefined,
+        category: data.category_id || undefined,
+        priority: data.priority || undefined,
+        timeRange: data.time_range || undefined,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at
+      }
+
+      setTasks(prev => prev.map(task => 
+        task.id === id ? updatedTask : task
+      ))
+      return updatedTask
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update task status')
       throw err
     }
   }
@@ -206,7 +265,13 @@ export function useSupabaseTasks() {
     const task = tasks.find(t => t.id === id)
     if (!task) throw new Error('Task not found')
     
-    await updateTask(id, { completed: !task.completed })
+    const newCompleted = !task.completed
+    const newStatus = newCompleted ? 'done' : 'todo'
+    
+    await updateTask(id, { 
+      completed: newCompleted,
+      status: newStatus
+    })
   }
 
   // Edit task with all fields
@@ -240,6 +305,7 @@ export function useSupabaseTasks() {
     error,
     addTask,
     updateTask,
+    updateTaskStatus,
     deleteTask,
     toggleTask,
     editTask,

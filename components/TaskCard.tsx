@@ -16,9 +16,10 @@ interface TaskCardProps {
   onToggle: (id: string) => void;
   onEdit: (id: string, title: string, description?: string, dueDate?: string, category?: string, priority?: 'High' | 'Mid' | 'Low', timeRange?: string) => void;
   onDelete: (id: string) => void;
+  onUpdateStatus?: (id: string, status: 'todo' | 'in-progress' | 'done') => void;
 }
 
-export function TaskCard({ task, onToggle, onEdit, onDelete }: TaskCardProps) {
+export function TaskCard({ task, onToggle, onEdit, onDelete, onUpdateStatus }: TaskCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -35,13 +36,30 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }: TaskCardProps) {
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    // Don't open edit dialog if clicking on interactive elements
+    if (target.closest('button') || 
+        target.closest('[data-radix-dropdown-trigger]') || 
+        target.closest('[data-radix-dropdown-content]')) {
+      return;
+    }
+    setIsEditDialogOpen(true);
+  };
+
   if (task.completed) {
     return (
       <>
-        <div className="w-full p-3 border-b border-neutral-200 flex justify-between items-center hover:bg-gray-100 transition-colors">
+        <div 
+          className="w-full p-3 border-b border-neutral-200 flex justify-between items-center hover:bg-gray-100 transition-colors cursor-pointer"
+          onClick={handleCardClick}
+        >
           <div className="flex justify-start items-center gap-2.5">
             <button
-              onClick={() => onToggle(task.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggle(task.id);
+              }}
               className="w-5 h-5 relative flex items-center justify-center"
             >
               <div className="w-5 h-5 absolute bg-gray-700 rounded-md"></div>
@@ -74,11 +92,50 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }: TaskCardProps) {
             )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="w-4 h-4 relative overflow-hidden" aria-label="Task options">
+                <button 
+                  className="w-4 h-4 relative overflow-hidden" 
+                  aria-label="Task options"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }}
+                  data-radix-dropdown-trigger
+                >
                   <MoreHorizontal className="w-4 h-4 text-neutral-200" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-[160px]">
+                {onUpdateStatus && (
+                  <>
+                    <DropdownMenuItem 
+                      className="flex items-center gap-2 cursor-pointer text-neutral-500 hover:text-neutral-900 font-dm-sans data-[highlighted]:text--700 data-[highlighted]:bg-neutral-100 py-2 rounded-[6px]"
+                      onClick={() => onUpdateStatus(task.id, 'todo')}
+                    >
+                      <div className="w-3 h-3 rounded border border-gray-400"></div>
+                      <span>To Do</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="flex items-center gap-2 cursor-pointer text-neutral-500 hover:text-neutral-900 font-dm-sans data-[highlighted]:text--700 data-[highlighted]:bg-neutral-100 py-2 rounded-[6px]"
+                      onClick={() => onUpdateStatus(task.id, 'in-progress')}
+                    >
+                      <div className="w-3 h-3 rounded border border-blue-500 bg-blue-50 flex items-center justify-center">
+                        <div className="w-2 h-0.5 bg-blue-500 rounded-full"></div>
+                      </div>
+                      <span>In Progress</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="flex items-center gap-2 cursor-pointer text-neutral-500 hover:text-neutral-900 font-dm-sans data-[highlighted]:text--700 data-[highlighted]:bg-neutral-100 py-2 rounded-[6px]"
+                      onClick={() => onUpdateStatus(task.id, 'done')}
+                    >
+                      <div className="w-3 h-3 rounded bg-gray-700 flex items-center justify-center">
+                        <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <span>Done</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuItem 
                   className="flex items-center gap-2 cursor-pointer text-neutral-500 hover:text-neutral-900 font-dm-sans data-[highlighted]:text--700 data-[highlighted]:bg-neutral-100 py-2 rounded-[6px]"
                   onClick={() => setIsEditDialogOpen(true)}
@@ -118,13 +175,43 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }: TaskCardProps) {
 
   return (
     <>
-      <div className="w-full p-3 border-b border-neutral-200 flex justify-between items-center hover:bg-gray-100 transition-colors">
+      <div 
+        className="w-full p-3 border-b border-neutral-200 flex justify-between items-center hover:bg-gray-100 transition-colors cursor-pointer"
+        onClick={handleCardClick}
+      >
         <div className="flex justify-start items-center gap-2.5">
           <button
-            onClick={() => onToggle(task.id)}
-            className="w-5 h-5 relative"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggle(task.id);
+            }}
+            className="w-5 h-5 relative flex items-center justify-center"
           >
-            <div className="w-5 h-5 left-0 top-0 absolute rounded-md border border-black/30"></div>
+            {task.status === 'todo' && (
+              <div className="w-5 h-5 rounded-md border border-black/30"></div>
+            )}
+            {task.status === 'in-progress' && (
+              <div className="w-5 h-5 rounded-md border border-blue-500 bg-blue-50 flex items-center justify-center">
+                <div className="w-3 h-0.5 bg-blue-500 rounded-full"></div>
+              </div>
+            )}
+            {task.status === 'done' && (
+              <div className="w-5 h-5 rounded-md bg-gray-700 flex items-center justify-center">
+                <svg 
+                  className="w-3 h-3 text-white" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M5 13l4 4L19 7" 
+                  />
+                </svg>
+              </div>
+            )}
           </button>
           <div className="flex justify-start items-center gap-3">
             <div className="justify-start text-black text-sm font-medium font-['DM_Sans'] leading-tight">
@@ -138,6 +225,15 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }: TaskCardProps) {
           </div>
         </div>
         <div className="flex justify-start items-center gap-3">
+          {/* Status Badge - In Progress */}
+          {task.status === 'in-progress' && (
+            <div className="px-3 py-1.5 rounded-full flex justify-start items-center gap-2.5 bg-blue-50 border border-blue-200">
+              <div className="justify-start text-blue-600 text-xs font-medium font-['DM_Sans'] leading-none">
+                In Progress
+              </div>
+            </div>
+          )}
+          
           {/* Priority Badge */}
           {task.priority && (
             <div className={`px-3 py-1.5 rounded-[40px] flex justify-start items-center gap-2.5 ${getPriorityStyles(task.priority)}`}>
@@ -159,7 +255,15 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }: TaskCardProps) {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="w-4 h-4 relative overflow-hidden" aria-label="Task options">
+              <button 
+                className="w-4 h-4 relative overflow-hidden" 
+                aria-label="Task options"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
+                data-radix-dropdown-trigger
+              >
                 <MoreHorizontal className="w-4 h-4 text-neutral-300 hover:text-neutral-600" />
               </button>
             </DropdownMenuTrigger>

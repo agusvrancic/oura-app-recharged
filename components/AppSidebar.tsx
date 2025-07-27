@@ -33,7 +33,7 @@ export function AppSidebar() {
   }
 
   return (
-    <aside className="w-[250px] bg-white border-r border-gray-200 flex flex-col h-screen overflow-hidden">
+    <aside className="w-[250px] bg-[#FAFAFA] border-r border-gray-200 flex flex-col h-screen overflow-hidden">
       {/* Header */}
       <div className="px-4 pt-6 pb-8 flex-shrink-0">
         <div className="flex items-center gap-3">
@@ -64,7 +64,7 @@ export function AppSidebar() {
             <li key={item.title}>
               <Link 
                 href={item.url}
-                className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl bg-[#EEEEEE] hover:bg-gray-200 transition-colors"
               >
                 <item.icon className="w-4 h-4" />
                 <span className="text-[13px] font-medium">{item.title}</span>

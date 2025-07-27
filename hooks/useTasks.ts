@@ -26,6 +26,7 @@ export function useTasks() {
       description,
       dueDate,
       completed: false,
+      status: 'todo',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

@@ -23,6 +23,7 @@ interface CategorySectionProps {
   onAddTask: (title: string, description?: string, dueDate?: string, categoryId?: string, priority?: 'High' | 'Mid' | 'Low', timeRange?: string) => void;
   onEditCategory?: (id: string, name: string, icon?: string) => Promise<void>;
   onDeleteCategory?: (id: string) => Promise<void>;
+  onUpdateTaskStatus?: (id: string, status: 'todo' | 'in-progress' | 'done') => void;
 }
 
 export function CategorySection({
@@ -35,7 +36,8 @@ export function CategorySection({
   onDeleteTask,
   onAddTask,
   onEditCategory,
-  onDeleteCategory
+  onDeleteCategory,
+  onUpdateTaskStatus
 }: CategorySectionProps) {
   const taskCount = tasks.filter(task => !task.completed).length;
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -68,7 +70,7 @@ export function CategorySection({
       <div className="w-full flex flex-col justify-start items-start mb-6">
       {/* Category Header */}
       <div 
-        className="w-full px-3 py-1.5 rounded-lg flex justify-start items-center gap-4 hover:bg-gray-50 transition-colors group"
+        className="w-full px-3 py-1.5 rounded-lg flex justify-start items-center gap-4 group"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -143,6 +145,7 @@ export function CategorySection({
               onToggle={onToggleTask}
               onEdit={onEditTask}
               onDelete={onDeleteTask}
+              onUpdateStatus={onUpdateTaskStatus}
             />
           ))}
           
