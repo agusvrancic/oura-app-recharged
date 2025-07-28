@@ -205,9 +205,16 @@ export function TaskCard({ task, onToggle, onEdit, onDelete, onUpdateStatus }: T
       >
         <div className="flex justify-start items-center gap-2.5">
           <button
+            onMouseDown={(e) => {
+              console.log('🔴 MOUSE DOWN on checkbox for task:', task.id);
+            }}
             onClick={(e) => {
+              console.log('🔵 CLICK EVENT on checkbox for task:', task.id);
+              console.log('🔵 Event target:', e.target);
+              console.log('🔵 Event currentTarget:', e.currentTarget);
               e.stopPropagation();
-              onToggle(task.id);
+              e.preventDefault();
+              handleCheckboxClick();
             }}
             className="w-5 h-5 relative flex items-center justify-center"
           >
