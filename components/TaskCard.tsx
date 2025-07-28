@@ -23,6 +23,8 @@ export function TaskCard({ task, onToggle, onEdit, onDelete, onUpdateStatus }: T
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  console.log('TaskCard rendered for task:', task.id, 'onUpdateStatus available:', !!onUpdateStatus, 'task.status:', task.status);
+
   const getPriorityStyles = (priority?: string) => {
     switch (priority) {
       case 'High':
@@ -76,13 +78,14 @@ export function TaskCard({ task, onToggle, onEdit, onDelete, onUpdateStatus }: T
           onClick={handleCardClick}
         >
           <div className="flex justify-start items-center gap-2.5">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleCheckboxClick();
-              }}
-              className="w-5 h-5 relative flex items-center justify-center"
-            >
+                      <button
+            onClick={(e) => {
+              console.log('Checkbox button clicked for task:', task.id);
+              e.stopPropagation();
+              handleCheckboxClick();
+            }}
+            className="w-5 h-5 relative flex items-center justify-center"
+          >
               <div className="w-5 h-5 absolute bg-gray-700 rounded-md"></div>
               <svg 
                 className="w-3 h-3 text-white relative z-10" 
