@@ -123,6 +123,9 @@ export function ScrumBoard({ tasks, categories = [], onToggleTask, onEditTask, o
         // Don't open if clicking on dropdown menu or its children
         if (target.closest('[data-radix-dropdown-trigger]') || 
             target.closest('[data-radix-dropdown-content]') ||
+            target.closest('[data-radix-dropdown-item]') ||
+            target.closest('[role="menuitem"]') ||
+            target.closest('.dropdown-menu') ||
             target.closest('button')) {
           return;
         }
@@ -170,14 +173,20 @@ export function ScrumBoard({ tasks, categories = [], onToggleTask, onEditTask, o
             <DropdownMenuContent align="end" className="w-[160px]">
               <DropdownMenuItem 
                 className="flex items-center gap-2 cursor-pointer text-neutral-500 hover:text-neutral-900 font-dm-sans data-[highlighted]:text--700 data-[highlighted]:bg-neutral-100 py-2 rounded-[6px]"
-                onClick={() => setIsEditDialogOpen(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditDialogOpen(true);
+                }}
               >
                 <Pencil className="h-4 w-4" />
                 <span>Edit</span>
               </DropdownMenuItem>
               <DropdownMenuItem 
                 className="flex items-center gap-2 cursor-pointer text-red-600 hover:text-red-700 font-dm-sans data-[highlighted]:text-red-700 data-[highlighted]:bg-red-50 py-2 rounded-[6px]"
-                onClick={() => setIsDeleteDialogOpen(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDeleteDialogOpen(true);
+                }}
               >
                 <Trash2 className="h-4 w-4" />
                 <span>Delete</span>
