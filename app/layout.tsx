@@ -14,8 +14,11 @@ const publicSans = Public_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Task Manager",
-  description: "A simple task manager application",
+  title: "Meridian App",
+  description: "Personal task management and productivity app",
+  icons: {
+    icon: '/app-icon.png',
+  },
 };
 
 export default function RootLayout({
