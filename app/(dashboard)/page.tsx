@@ -21,7 +21,7 @@ export default function Home() {
   
   const [activeFilter, setActiveFilter] = useState<FilterType>('All');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['work', 'home', 'uncategorized']));
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['work', 'home', 'groceries', 'uncategorized']));
   const [isCreateCategoryDialogOpen, setIsCreateCategoryDialogOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
   
@@ -109,12 +109,12 @@ export default function Home() {
    };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full w-full">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-[24px] font-regular text-neutral-900">
-            Hello, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}! <span className="hand">👋</span>
+          <h1 className="text-[20px] sm:text-[24px] font-regular text-neutral-900">
+            Hello, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Username'}! <span className="hand">👋</span>
           </h1>
           <p className="text-[14px] text-neutral-500 mt-1 font-dm-sans">
             {currentDate}
@@ -137,7 +137,7 @@ export default function Home() {
       />
 
       {/* Content */}
-      <div className="flex-1">
+      <div className="flex-1 w-full overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
@@ -147,17 +147,19 @@ export default function Home() {
           <EmptyState />
         ) : viewMode === 'board' ? (
           // Board view
-          <ScrumBoard
-            tasks={filteredTasks}
-            categories={categories}
-            onToggleTask={toggleTask}
-            onEditTask={editTask}
-            onDeleteTask={deleteTask}
-            onUpdateStatus={updateTaskStatus}
-          />
+          <div className="w-full overflow-x-auto">
+            <ScrumBoard
+              tasks={filteredTasks}
+              categories={categories}
+              onToggleTask={toggleTask}
+              onEditTask={editTask}
+              onDeleteTask={deleteTask}
+              onUpdateStatus={updateTaskStatus}
+            />
+          </div>
         ) : activeCategory ? (
           // Single category view (List)
-          <div>
+          <div className="w-full">
             {filteredTasks.map((task: Task) => (
               <TaskCard 
                 key={task.id} 
@@ -171,7 +173,7 @@ export default function Home() {
           </div>
         ) : (
           // Category sections view (List)
-          <div className="space-y-6">
+          <div className="space-y-6 w-full">
             {categories.map((category: Category) => {
               const categoryTasks = tasksByCategory.get(category.id) || [];
               if (categoryTasks.length === 0) return null;

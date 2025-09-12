@@ -119,25 +119,24 @@ const mockCategories: MockCategory[] = [
     createdAt: '2024-01-01T00:00:00Z',
   },
   {
-    id: 'personal',
-    name: 'Personal',
+    id: 'home',
+    name: 'Home',
     icon: '🏠',
     color: 'green',
     createdAt: '2024-01-01T00:00:00Z',
   },
   {
-    id: 'learning',
-    name: 'Learning',
-    icon: '📚',
-    color: 'purple',
+    id: 'groceries',
+    name: 'Groceries',
+    icon: '🛒',
+    color: 'red',
     createdAt: '2024-01-01T00:00:00Z',
   },
 ];
 
 export function useMockTasks() {
-  // Temporarily empty for EmptyState preview - uncomment the line below to restore tasks
-  // const [tasks, setTasks] = useState<Task[]>(mockTasks);
-  const [tasks, setTasks] = useState<Task[]>([]);
+  // Enable mock tasks for preview
+  const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [loading, setLoading] = useState(false);
 
   const addTask = (title: string, description?: string, dueDate?: string, categoryId?: string, priority?: 'High' | 'Mid' | 'Low', timeRange?: string) => {
