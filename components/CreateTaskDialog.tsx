@@ -207,14 +207,12 @@ export function CreateTaskDialog({
                       setDate(selectedDate);
                       setCalendarOpen(false);
                     }}
-                    defaultMonth={new Date()}
+                    defaultMonth={date || new Date()}
                     initialFocus
                     className="bg-white"
-                    modifiers={{
-                      today: new Date()
-                    }}
-                    modifiersClassNames={{
-                      today: "bg-black text-white font-medium hover:bg-gray-800"
+                    classNames={{
+                      today: "bg-black text-white font-medium hover:bg-gray-800 rounded-xl",
+                      selected: "border-2 border-black text-black font-medium hover:bg-gray-50 rounded-xl data-[selected=true]:border-black data-[selected=true]:border-2 data-[selected=true]:rounded-xl"
                     }}
                   />
                 </PopoverContent>
