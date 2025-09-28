@@ -176,9 +176,27 @@ export function CreateTaskDialog({
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="w-full text-left text-black/30 text-sm font-normal font-['DM_Sans'] leading-none"
+                    className={cn(
+                      "w-full text-left text-sm font-normal font-['DM_Sans'] leading-none",
+                      date 
+                        ? (date.toDateString() === new Date().toDateString() 
+                          ? "text-red-600 font-semibold" 
+                          : "text-black") 
+                        : "text-black/30"
+                    )}
                   >
-                    {date ? format(date, "MMMM d, yyyy") : "Due Date"}
+                    {date ? (
+                      <span className="flex items-center gap-2">
+                        {format(date, "MMMM d, yyyy")}
+                        {date.toDateString() === new Date().toDateString() && (
+                          <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-medium">
+                            Today
+                          </span>
+                        )}
+                      </span>
+                    ) : (
+                      "Due Date"
+                    )}
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 bg-white border border-neutral-200 shadow-lg" align="start">
@@ -189,8 +207,15 @@ export function CreateTaskDialog({
                       setDate(selectedDate);
                       setCalendarOpen(false);
                     }}
+                    defaultMonth={new Date()}
                     initialFocus
                     className="bg-white"
+                    modifiers={{
+                      today: new Date()
+                    }}
+                    modifiersClassNames={{
+                      today: "bg-red-100 text-red-600 font-semibold border-red-200 border-2"
+                    }}
                   />
                 </PopoverContent>
               </Popover>

@@ -30,7 +30,7 @@ export function AppTopbar() {
           <div className="w-9 h-9 relative">
             <Image
               src="/app-icon.png"
-              alt="Meridian App Logo"
+              alt="Meridian Logo"
               width={36}
               height={36}
               className="rounded-[10px]"
@@ -38,7 +38,7 @@ export function AppTopbar() {
           </div>
           <div className="flex flex-col">
             <span className="text-neutral-900 text-base font-bold leading-tight font-dm-sans">
-              Meridian App
+              Meridian
             </span>
             <span className="text-neutral-500 text-xs leading-none mt-1 font-dm-sans">
               Free Plan

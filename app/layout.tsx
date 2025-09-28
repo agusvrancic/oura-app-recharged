@@ -14,7 +14,7 @@ const publicSans = Public_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Meridian App",
+  title: "Meridian",
   description: "Personal task management and productivity app",
   icons: {
     icon: '/app-icon.png',

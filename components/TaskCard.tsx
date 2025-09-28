@@ -292,9 +292,22 @@ export function TaskCard({ task, onToggle, onEdit, onDelete, onUpdateStatus }: T
           {/* Due Date */}
           {task.dueDate && (
             <div className="flex items-center gap-1.5">
-              <CalendarIcon className="h-3.5 w-3.5 text-neutral-400" />
-              <span className="text-[12px] text-neutral-500 font-['DM_Sans']">
+              <CalendarIcon className={`h-3.5 w-3.5 ${
+                new Date(task.dueDate).toDateString() === new Date().toDateString() 
+                  ? 'text-red-500' 
+                  : 'text-neutral-400'
+              }`} />
+              <span className={`text-[12px] font-['DM_Sans'] ${
+                new Date(task.dueDate).toDateString() === new Date().toDateString()
+                  ? 'text-red-600 font-semibold'
+                  : 'text-neutral-500'
+              }`}>
                 {format(new Date(task.dueDate), "PPP")}
+                {new Date(task.dueDate).toDateString() === new Date().toDateString() && (
+                  <span className="ml-1 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-medium">
+                    Today
+                  </span>
+                )}
               </span>
             </div>
           )}

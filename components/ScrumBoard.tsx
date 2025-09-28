@@ -204,8 +204,17 @@ export function ScrumBoard({ tasks, categories = [], onToggleTask, onEditTask, o
         
         {/* Due Date */}
         {task.dueDate && (
-          <div className="justify-start text-black/60 text-sm font-normal font-['Geist']">
+          <div className={`justify-start text-sm font-['Geist'] ${
+            new Date(task.dueDate).toDateString() === new Date().toDateString()
+              ? 'text-red-600 font-semibold'
+              : 'text-black/60 font-normal'
+          }`}>
             Due Date: {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: '2-digit' })}
+            {new Date(task.dueDate).toDateString() === new Date().toDateString() && (
+              <span className="ml-2 text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-medium">
+                Today
+              </span>
+            )}
           </div>
         )}
         
