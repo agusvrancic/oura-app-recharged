@@ -214,7 +214,7 @@ export function CreateTaskDialog({
                       today: new Date()
                     }}
                     modifiersClassNames={{
-                      today: "bg-red-100 text-red-600 font-semibold border-red-200 border-2"
+                      today: "bg-black text-white font-medium hover:bg-gray-800"
                     }}
                   />
                 </PopoverContent>
