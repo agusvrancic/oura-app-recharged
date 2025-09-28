@@ -209,10 +209,16 @@ export function CreateTaskDialog({
                     }}
                     defaultMonth={date || new Date()}
                     initialFocus
-                    className="bg-white"
+                    className="bg-white [&_.rdp-day_today]:!bg-black [&_.rdp-day_today]:!text-white [&_.rdp-day_today]:!rounded-xl"
                     classNames={{
-                      today: "bg-black text-white font-medium hover:bg-gray-800 rounded-xl",
+                      today: "!bg-black !text-white font-medium hover:!bg-gray-800 !rounded-xl !border-black",
                       selected: "border-2 border-black text-black font-medium hover:bg-gray-50 rounded-xl data-[selected=true]:border-black data-[selected=true]:border-2 data-[selected=true]:rounded-xl"
+                    }}
+                    modifiers={{
+                      today: new Date()
+                    }}
+                    modifiersClassNames={{
+                      today: "!bg-black !text-white !rounded-xl font-medium hover:!bg-gray-800"
                     }}
                   />
                 </PopoverContent>
